@@ -26,10 +26,7 @@
 
                :bit {:size 1
                      :js-get "getUint8"
-                     :process (fn [value pos]
-                                (println "pos is" (mod pos 8))
-                                (println "value is" value)
-                                (bit-test value (mod pos 8)))}})
+                     :process (fn [value pos] (bit-test value (mod pos 8)))}})
 
 (def binary-types {
                    :charstring {:sizable true
@@ -52,12 +49,10 @@
 (defn no-process [val _] val)
 
 (defn read-data [dv {:keys [length formatter le js-type], :or {formatter no-process}} index]
-  (println "type size:" (< (:size js-type) 8))
   (let [get-func (.bind (aget dv (:js-get js-type)) dv)
         adjusted-index (/ index 8)
         {:keys [size process] :or {process identity}} js-type]
 
-    (println "adjusted-index is" adjusted-index)
     [(* length size)
      (formatter
        (if (> length 1)
