@@ -50,17 +50,16 @@
 
 (defn read-data [dv {:keys [length formatter le js-type], :or {formatter no-process}} index]
   (let [get-func (.bind (aget dv (:js-get js-type)) dv)
-        adjusted-index (/ index 8)
         {:keys [size process] :or {process identity}} js-type]
 
     [(* length size)
      (formatter
        (if (> length 1)
          (loop [pos 0 data []]
-           (if (= pos length)
+           (if (= (/ pos size) length)
              data
-             (recur (inc pos) (conj data (process
-                                           (get-func (/ (+ index pos) 8) le)
+             (recur (+ size pos) (conj data (process
+                                           (get-func (/ (+ pos index) 8) le)
                                            (+ index pos))))))
          (process (get-func (/ index 8) le) index)))]))
 
