@@ -6,7 +6,7 @@ Early stage experiment in creating a simple DSL for reading packed binary data. 
 
 Reading packed binary data is as easy as:
 
-```clojurescript
+```clojure
 (read-spec packed-data [:name :charstring-4
 			:version :uint8
 			:simple-flag :bit
