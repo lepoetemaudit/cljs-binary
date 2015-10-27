@@ -1,10 +1,18 @@
-# binary
+# cljs-binary
 
-FIXME: Write a one-line description of your library/project.
+Early stage experiment in creating a simple DSL for reading packed binary data. Some libraries exist for Clojure, but nothing that does quite what I need for ClojureScript (reading in binary data down to the bit level, understanding endianness etc).
 
 ## Overview
 
-FIXME: Write a paragraph about the library/project and highlight its goals.
+Reading packed binary data is as easy as:
+
+```clojurescript
+(read-spec packed-data [:name :charstring-4
+			:version :uint8
+			:simple-flag :bit
+			:another-flag :bit
+			:6bit-number :ubitnum-6])
+```
 
 ## Setup
 
@@ -34,6 +42,4 @@ get live reloading, nor a REPL.
 
 ## License
 
-Copyright © 2014 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
+See `LICENSE`
