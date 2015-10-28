@@ -26,7 +26,9 @@
 
                :bit {:size 1
                      :js-get "getUint8"
-                     :process (fn [value pos] (bit-test value (mod pos 8)))}})
+                     :process (fn [value pos]
+                                (println value)
+                                (bit-test value (mod pos 8)))}})
 
 (def binary-types {
                    :charstring {:sizable true
@@ -35,6 +37,12 @@
                    :uint8       {:js-type :uint8}
                    :bit         {:js-type :bit}
                    :ubitnum     {:js-type :bit
+                                 :formatter #(reduce + (map-indexed
+                                                         (fn [i val]
+                                                           (if val
+                                                             (bit-shift-left 1 i)
+                                                             0)) %))
+
                                  :sizable true}})
 
 (defn parse-type-key [key]
@@ -83,7 +91,7 @@
 (defn on-js-reload []
     (println (read-spec [:name :charstring-4
                          :two :uint8
-                         :smallnum :ubitnum-13
+                         :smallnum :ubitnum-8
                          ]))
 
     ;; optionally touch your app-state to force rerendering depending on
