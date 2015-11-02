@@ -1,5 +1,6 @@
 (ns ^:figwheel-always binary.core
-    (:require [clojure.string :as string]))
+    (:require [clojure.string :as string]
+              [goog.net.XhrIo :as gxhr]))
 
 (enable-console-print!)
 
@@ -27,7 +28,6 @@
                :bit {:size 1
                      :js-get "getUint8"
                      :process (fn [value pos]
-                                (println value)
                                 (bit-test value (mod pos 8)))}})
 
 (def binary-types {
@@ -71,30 +71,40 @@
                                            (+ index pos))))))
          (process (get-func (/ index 8) le) index)))]))
 
-(defn read-spec [spec]
-    (let [buf (char-array-to-ab "halohhwareyou")
-          dv (new js/DataView buf)
+
+(defn read-spec ([buf spec position]
+    (let [dv (new js/DataView buf)
           partitioned (partition 2 spec)]
 
         (loop [pos 0 items partitioned output {}]
             (let [[item definition] (first items)
-                  parsed-key (parse-type-key definition)
-                  [size value] (read-data dv parsed-key pos)
+                  [size value] (if (seqable? item)
+                                 (read-spec buf item position)
+                                 (read-data dv (parse-type-key definition) pos))
+
                   out (assoc output item value)]
 
               (if (> (count items) 1)
                   (recur (+ pos size) (drop 1 items) out)
-                  out)))))
+                  [pos out])))))
 
+  ([buf spec] (read-spec buf spec 0)))
+
+
+(def buf (char-array-to-ab "halohhwareyou"))
 
 
 (defn on-js-reload []
-    (println (read-spec [:name :charstring-4
-                         :two :uint8
-                         :smallnum :ubitnum-8
-                         ]))
+  ;(println "reloaded")
+  ;(download-file "/lev.ark")
+  (println (read-spec
+             buf
+             [:my-tile
+               [:name :charstring-4
+                :two :uint8
+                :smallnum :ubitnum-8]]))
 
-    ;; optionally touch your app-state to force rerendering depending on
-    ;; your application
-    ;; (swap! app-state update-in [:__figwheel_counter] inc)
-    )
+  ;; optionally touch your app-state to force rerendering depending on
+  ;; your application
+  ;; (swap! app-state update-in [:__figwheel_counter] inc)
+  )
